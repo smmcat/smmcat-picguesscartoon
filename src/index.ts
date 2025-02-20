@@ -79,7 +79,7 @@ export function apply(ctx: Context, config: Config) {
     },
     async createPlay(session: Session<"id">) {
       if (this.userTemp[session.userId]) return
-      await session.send('进入限时1分钟快速答题环节，题目为10道题。请稍等...')
+      await session.send('进入限时2分钟快速答题环节，题目为10道题。请稍等...')
       const startTime = +new Date()
       this.userTemp[session.userId] = {
         startTime,
@@ -95,7 +95,7 @@ export function apply(ctx: Context, config: Config) {
       let dict = Object.keys(guessCartoon.optionsDict).slice(0, topic.options.length)
       let next = false
       let upStatus = true
-      while (+new Date() - startTime < 60000 || this.userTemp[session.userId].topicLen <= 10) {
+      while (+new Date() - startTime < 120000 && this.userTemp[session.userId].topicLen < 10) {
         try {
           // 下一题
           if (next) {
@@ -109,11 +109,11 @@ export function apply(ctx: Context, config: Config) {
           // 播报题目
           await session.send(this.showFormat(topic) + '\n' +
             `当前为第${this.userTemp[session.userId].topicLen}题；请直接回答正确的序号，如需退出请发送 退出`);
-          config.debug && console.log(`剩余时间:${60000 - (+new Date() - startTime)}`);
+          config.debug && console.log(`剩余时间:${120000 - (+new Date() - startTime)}`);
           if (upStatus) {
             upTime = +new Date()
           }
-          const select = await session.prompt(60000 - (+new Date() - startTime))
+          const select = await session.prompt(120000 - (+new Date() - startTime))
 
           if (!select) {
             break;
@@ -163,9 +163,9 @@ export function apply(ctx: Context, config: Config) {
 
       // 撰写评价
       let tip = { msg: [], pic: '' }
-      if (userItem.topicLen == 3) {
+      if (userItem.topicLen == 0) {
         tip = totalMsg.no[random(0, totalMsg.no.length)]
-      } else if (userItem.topicLen >= 10 && userItem.mistake == 0) {
+      } else if (userItem.right >= 10 && userItem.mistake == 0) {
         tip = totalMsg.good[random(0, totalMsg.good.length)]
         tip.msg = ["居然全对，厉害厉害！", "不愧是你啊，全部正确", "太棒了！全对，100昏"]
       } else if (userItem.right >= 6 && userItem.right / userItem.topicLen > 0.7) {
@@ -186,15 +186,15 @@ export function apply(ctx: Context, config: Config) {
   const totalMsg = {
     good: [
       {
-        msg: ["是个二刺螈", "这些题目真的~超~简单~的", "哼，不过如此", "不愧是我"],
+        msg: ["是个二刺螈", "这些题目真的~超~简~单~的", "哼，不过如此", "不愧是我"],
         pic: 'https://smmcat.cn/run/katong/good.png'
       },
       {
-        msg: ["是个二刺螈", "这些题目真的~超~简单~的", "可以可以，打的不错", "不愧是你"],
+        msg: ["啊是大佬，wsl", "这些题目真的~超~简~单~的", "可以可以，答的不错", "不愧是你"],
         pic: 'https://smmcat.cn/run/katong/good2.png'
       },
       {
-        msg: ["这些题目能再难点吗", "我超会答的", "居然这么简单的过了", "不愧是我"],
+        msg: ["这些题目能再难点吗", "开玩笑，我超勇，我超会答的", "居然这么简单的过了", "不愧是我"],
         pic: 'https://smmcat.cn/run/katong/good3.png'
       }
     ],

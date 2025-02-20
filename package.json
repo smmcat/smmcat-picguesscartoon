@@ -1,7 +1,7 @@
 {
   "name": "koishi-plugin-smmcat-picguesscartoon",
   "description": "截图猜动画[数据来源:lab.magiconch.com]",
-  "version": "0.0.9",
+  "version": "0.0.12",
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
   "files": [
